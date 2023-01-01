@@ -183,6 +183,7 @@ def main():
     points = 0
     font = pg.font.Font('freesansbold.ttf', 20)
     obstacles = []
+    death_count = 0
 
     def background():
         global x_pos_bg, y_pos_bg
@@ -227,7 +228,9 @@ def main():
             obstacle.draw(SCREEN)
             obstacle.update()
             if player.dino_rect.colliderect(obstacle.rect):
-                pg.draw.rect(SCREEN, (255, 0, 0), player.dino_rect, 2)
+                pg.time.delay(2000)
+                death_count += 1
+                menu(death_count)
 
         background()
 
@@ -239,5 +242,30 @@ def main():
         clock.tick(30)
         pg.display.update()
 
+def menu(death_count):
+    global points
+    run = True
+    while run:
+        SCREEN.fill((255,255,255))
+        font = pg.font.Font('freesansbold.ttf', 30)
 
-main()
+        if not death_count:
+            text = font.render('Press any key to start', True, (0,0,0))
+        else:
+            text = font.render('Press any key to restart', True, (0,0,0))
+            score = font.render('Your score: ' + str(points), True, (0,0,0))
+            scoreRect = score.get_rect()
+            scoreRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50)
+            SCREEN.blit(score, scoreRect)
+        textRect = text.get_rect()
+        textRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        SCREEN.blit(text, textRect)
+        SCREEN.blit(RUNNING[0], (SCREEN_WIDTH // 2 - 20, SCREEN_HEIGHT // 2  - 140))
+        pg.display.update()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
+            if event.type == pg.KEYDOWN:
+                main()
+
+menu(death_count=0)
